@@ -57,4 +57,9 @@ class ClanAssistantCog(commands.Cog, name="Clan Assistant"):
                 'channel_id': channel.id,
                 'channel_name': channel.name}
         await self.save_config()
+
+    @set_verification_channel.error
+    async def set_verification_channel_error(self, context, error):
+        # Normal users don't need to know that these commands exist
+        pass
     
