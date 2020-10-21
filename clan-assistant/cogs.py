@@ -48,14 +48,17 @@ class ClanAssistantCog(commands.Cog, name="Clan Assistant"):
             category_string = f"{category.name}: "
         print(f"Channel: {channel.id}\t{category_string}{channel.name}")
 
+        accepted_clans = []
         if str(guild.id) in self.servers_config:
-            self.servers_config.pop(str(guild.id))
+            data = self.servers_config.pop(str(guild.id))
+            accepted_clans = data['clans']
         self.servers_config[str(guild.id)] = {
                 'server_name': guild.name,
                 'category_id': category.id if category else None,
                 'category_name': category.name if category else None,
                 'channel_id': channel.id,
-                'channel_name': channel.name}
+                'channel_name': channel.name,
+                'clans': accepted_clans}
         await self.save_config()
 
     @set_verification_channel.error
