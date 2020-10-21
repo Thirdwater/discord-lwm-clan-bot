@@ -63,6 +63,37 @@ class ClanAssistantCog(commands.Cog, name="Clan Assistant"):
 
     @set_verification_channel.error
     async def set_verification_channel_error(self, context, error):
-        # Normal users don't need to know that these commands exist
+        # Normal users don't need to know that these commands exist.
         pass
-    
+
+    @commands.group(name='clan', invoke_without_command=True)
+    @commands.has_permissions(manage_channels=True)
+    async def clan(self, context):
+        "Manages clan-to-discord registrations"
+        await context.send_help(context.command)
+
+    @clan.command(name='list', aliases=['ls'])
+    @commands.has_permissions(manage_channels=True)
+    async def list_clans(self, context):
+        "Shows all clans registered to this discord server"
+        print(context.command)
+
+    @clan.command(name='register', aliases=['add', 'new'])
+    @commands.has_permissions(manage_channels=True)
+    async def register_clan(self, context):
+        "Registers the specified clan to this discord server"
+        print(context.command)
+
+    @clan.command(name='remove', aliases=['delete', 'del', 'rm'])
+    @commands.has_permissions(manage_channels=True)
+    async def remove_clan(self, context):
+        "Removes the specified clan from this discord server"
+        print(context.command)
+
+    @clan.error
+    @list_clans.error
+    @register_clan.error
+    @remove_clan.error
+    async def clan_error(self, context, error):
+        # Normal users don't need to know that these commands exist.
+        pass
