@@ -1,3 +1,6 @@
+# Project-specifics
+servers-config.json
+
 # Environments
 venv
 .env
