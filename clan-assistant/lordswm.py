@@ -10,11 +10,17 @@ class LWMInterface:
     COM_DOMAIN = "https://www.lordswm.com"
     RU_DOMAIN = "https://www.heroeswm.ru"
     DOMAIN_REGEX = r".*(?:lordswm\.com|heroeswm\.ru)\/?(.*)"
+    COM_DOMAIN_REGEX = r".*lordswm\.com\/?(.*)"
+    RU_DOMAIN_REGEX = r".*heroeswm\.ru\/?(.*)"
     BASE_PATTERN = regex.compile(DOMAIN_REGEX)
+    COM_PATTERN = regex.compile(COM_DOMAIN_REGEX)
+    RU_PATTERN = regex.compile(RU_DOMAIN_REGEX)
 
     PLAYER_PAGE = "pl_info.php"
     PLAYER_PAGE_NAME_XPATH = "//td[@class='wb'][1]//b[1]/text()"
     PLAYER_PAGE_CLANS_XPATH = "//table[@class='wblight'][2]//td[@class='wb']/text()"
+    PLAYER_PAGE_REGEX = r".*(lordswm\.com|heroeswm\.ru)\/pl_info\.php\?(?:\w+(?:=\w+)?\&)*id=([0-9]+)"
+    PLAYER_PAGE_PATTERN = regex.compile(PLAYER_PAGE_REGEX)
     PLAYER_URL_ID_PATTERN = regex.compile(r".*id=([0-9]+)")
 
     CLAN_PAGE = "clan_info.php"
@@ -22,8 +28,52 @@ class LWMInterface:
     CLAN_HASH_ID_PATTERN = regex.compile(r".*#([0-9]+)")
     CLAN_TITLE_PATTERN = regex.compile(r"#([0-9]+) (.*)")
 
-    def __init__(self):
-        self.clans = {}
+    def get_player_new(self, player):
+        url, player_id = self.format_profile_url(player)
+        if url is None:
+            return None
+
+        page = requests.get(url['com'])
+        if page.status_code != 200:
+            return None
+
+        tree = html.fromstring(page.content)
+        player_name = self.get_player_name(tree)
+        if player_name is None:
+            return None
+        player_description = self.get_player_description(tree)
+        clans = self.get_player_clans(tree)
+        
+        return {
+            'id': player_id,
+            'name': player_name,
+            'description': player_description,
+            'url': url,
+            'clans': clans
+        }
+
+    def format_profile_url(self, player):
+        url_match = self.PLAYER_PAGE_PATTERN.match(player)
+        id_match = self.NUMBER_PATTERN.match(player)
+        if url_match:
+            player_id = url_match.group(2)
+        else if id_match:
+            player_id = player
+        else:
+            return None, None
+        url = {}
+        url['ru'] = f"{self.RU_DOMAIN}/{self.PLAYER_PAGE}?id={player_id}"
+        url['com'] = f"{self.COM_DOMAIN}/{self.PLAYER_PAGE}?id={player_id}"
+        return url, player_id
+
+    def get_player_name(self, tree):
+        return None
+
+    def get_player_description(self, tree):
+        return None
+
+    def get_player_clans(self, tree):
+        return None
 
     def get_player(self, player):
         if LWMInterface.NUMBER_PATTERN.match(player):
