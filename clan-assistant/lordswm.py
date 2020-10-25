@@ -13,16 +13,18 @@ class LWMInterface:
     DOMAIN_REGEX = r".*(?:lordswm\.com|heroeswm\.ru)\/?(.*)"
     COM_DOMAIN_REGEX = r".*lordswm\.com\/?(.*)"
     RU_DOMAIN_REGEX = r".*heroeswm\.ru\/?(.*)"
+    QUERY_STRING_ID_REGEX = r".*id=([0-9]+)"
     BASE_PATTERN = regex.compile(DOMAIN_REGEX)
     COM_PATTERN = regex.compile(COM_DOMAIN_REGEX)
     RU_PATTERN = regex.compile(RU_DOMAIN_REGEX)
+    QUERY_STRING_ID_PATTERN = regex.compile(QUERY_STRING_ID_REGEX)
 
     PLAYER_PAGE = "pl_info.php"
     PLAYER_PAGE_REGEX = r".*(lordswm\.com|heroeswm\.ru)\/pl_info\.php\?(?:\w+(?:=\w+)?\&)*id=([0-9]+)"
     PLAYER_PAGE_PATTERN = regex.compile(PLAYER_PAGE_REGEX)
     PLAYER_PAGE_NAME_PLATE_XPATH = "//table[@class='wblight'][1]/descendant::td[@class='wb'][1]//b[1]/text()"
     PLAYER_PAGE_DESCRIPTION_XPATH = "//center/table[2]//table[@class='wblight'][last()]//tr[last()]/td//text()"
-    PLAYER_PAGE_CLANS_XPATH = "//table[@class='wblight'][2]//td[@class='wb']/text()"
+    PLAYER_PAGE_CLANS_XPATH = "//table[@class='wblight'][2]//following-sibling::tr[//b/text() = 'Clans']//td/a"
 
     CLAN_PAGE = "clan_info.php"
     CLAN_PAGE_TITLE_XPATH = "//td[@class='wblight']/b[1]/text()"
@@ -31,6 +33,7 @@ class LWMInterface:
 
     def get_player_new(self, player):
         url, player_id = self.format_profile_url(player)
+        print("\n")
         print("URL: " + str(url))
         if url is None:
             return None
@@ -48,8 +51,9 @@ class LWMInterface:
         player_level = self.get_player_level(tree)
         print("Player level: " + str(player_level))
         player_description = self.get_player_description(tree)
-        print("Player description: " + str(player_description))
+        # print("Player description: " + str(player_description))
         clans = self.get_player_clans(tree)
+        print("Player clans: " + str(clans))
         
         return {
             'id': player_id,
@@ -101,7 +105,21 @@ class LWMInterface:
         return '\n'.join(description)
 
     def get_player_clans(self, tree):
-        return None
+        clan_links = tree.xpath(self.PLAYER_PAGE_CLANS_XPATH)
+        clans = []
+        for link in clan_links:
+            clan_name = link.findtext('b')
+            clan_page = link.get('href')
+            clan_id = self.QUERY_STRING_ID_PATTERN.match(clan_page).group(1)
+            url = {}
+            url['ru'] = f"{self.RU_DOMAIN}/{clan_page}"
+            url['com'] = f"{self.COM_DOMAIN}/{clan_page}"
+            clan = {
+                    'id': clan_id,
+                    'name': clan_name,
+                    'url': url}
+            clans.append(clan)
+        return clans
 
     def get_player(self, player):
         if LWMInterface.NUMBER_PATTERN.match(player):
@@ -189,3 +207,4 @@ if __name__ == '__main__':
     li.get_player_new(8464564564848454646)
     li.get_player_new(545081)
     li.get_player_new(4366341)
+    li.get_player_new(45644)
