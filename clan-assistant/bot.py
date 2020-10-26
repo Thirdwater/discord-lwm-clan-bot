@@ -3,7 +3,7 @@
 import os
 from dotenv import load_dotenv
 from discord.ext import commands
-from cogs import ClanAssistantCog
+# from cogs import ClanAssistantCog
 
 
 def main():
@@ -11,7 +11,7 @@ def main():
     token = os.getenv('DISCORD_TOKEN')
     
     bot = commands.Bot(command_prefix='!')
-    bot.add_cog(ClanAssistantCog(bot))
+    # bot.add_cog(ClanAssistantCog(bot))
     bot.run(token)
 
 
