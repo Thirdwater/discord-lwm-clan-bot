@@ -7,6 +7,7 @@ from discord.ext import commands
 from persistence import PersistenceCog
 from clan import ClanCog
 from verification import VerificationCog
+from log import LogCOg
 
 
 def main():
@@ -17,6 +18,7 @@ def main():
     bot.add_cog(PersistenceCog(bot))
     bot.add_cog(ClanCog(bot))
     bot.add_cog(VerificationCog(bot))
+    bot.add_cog(LogCog(bot))
     bot.run(token)
 
 
