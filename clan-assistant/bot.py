@@ -15,10 +15,12 @@ def main():
     token = os.getenv('DISCORD_TOKEN')
     
     bot = commands.Bot(command_prefix='!')
+
     bot.add_cog(PersistenceCog(bot))
     bot.add_cog(ClanCog(bot))
     bot.add_cog(VerificationCog(bot))
     bot.add_cog(LogCog(bot))
+
     bot.run(token)
 
 

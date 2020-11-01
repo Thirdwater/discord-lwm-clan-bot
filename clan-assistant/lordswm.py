@@ -10,13 +10,7 @@ class LWMInterface:
 
     COM_DOMAIN = "https://www.lordswm.com"
     RU_DOMAIN = "https://www.heroeswm.ru"
-    DOMAIN_REGEX = r".*(?:lordswm\.com|heroeswm\.ru)\/?(.*)"
-    COM_DOMAIN_REGEX = r".*lordswm\.com\/?(.*)"
-    RU_DOMAIN_REGEX = r".*heroeswm\.ru\/?(.*)"
     QUERY_STRING_ID_REGEX = r".*id=([0-9]+)"
-    BASE_PATTERN = regex.compile(DOMAIN_REGEX)
-    COM_PATTERN = regex.compile(COM_DOMAIN_REGEX)
-    RU_PATTERN = regex.compile(RU_DOMAIN_REGEX)
     QUERY_STRING_ID_PATTERN = regex.compile(QUERY_STRING_ID_REGEX)
 
     PLAYER_PAGE = "pl_info.php"
@@ -33,12 +27,8 @@ class LWMInterface:
     CLAN_PAGE_DESCRIPTION_XPATH = "(//center/table[2]//table[@class='wb'][1]//td[@class='wbwhite'])[last()]//text()"
     CLAN_PAGE_MEMBERS_XPATH = "(//table[@class='wb'])[last()]//tr"
 
-    CLAN_PAGE_TITLE_XPATH = "//td[@class='wblight']/b[1]/text()"
-    CLAN_HASH_ID_PATTERN = regex.compile(r".*#([0-9]+)")
-    CLAN_TITLE_PATTERN = regex.compile(r"#([0-9]+) (.*)")
-
-    def get_player_new(self, player):
-        url, player_id = self.format_profile_url(player)
+    def get_player(self, player):
+        url, player_id = self.format_player_url(player)
         if url is None:
             return None
 
@@ -62,7 +52,7 @@ class LWMInterface:
             'url': url,
             'clans': clans}
 
-    def get_clan_new(self, clan):
+    def get_clan(self, clan):
         url, clan_id = self.format_clan_url(clan)
         if url is None:
             return None
@@ -85,7 +75,7 @@ class LWMInterface:
                 'url': url,
                 'members': members}
 
-    def format_profile_url(self, player):
+    def format_player_url(self, player):
         url_match = self.PLAYER_PAGE_PATTERN.match(str(player))
         id_match = self.NUMBER_PATTERN.match(str(player))
         if url_match:
@@ -198,13 +188,10 @@ class LWMInterface:
                         event_points = event_element.text
                     else:
                         event_points = event_element.findtext('b')
-                else:
-                    event_points = 0
-                    event_status = 'green'
             url = {}
             url['ru'] = f"{self.RU_DOMAIN}/{profile_page}"
             url['com'] = f"{self.COM_DOMAIN}/{profile_page}"
-            
+
             member = {
                     'clan_order': order,
                     'id': member_id,
@@ -217,92 +204,8 @@ class LWMInterface:
             members.append(member)
         return members
 
-    def get_player(self, player):
-        if LWMInterface.NUMBER_PATTERN.match(player):
-            url = self.add_query(
-                    f"{LWMInterface.COM_DOMAIN}/{LWMInterface.PLAYER_PAGE}",
-                    'id',
-                    player)
-        else:
-            url = player
-        if not url.startswith("http"):
-            url = "https://" + url
-        page = requests.get(url)
-        if page.status_code != 200:
-            return None
-
-        tree = html.fromstring(page.content)
-        name = tree.xpath(LWMInterface.PLAYER_PAGE_NAME_XPATH)
-        clans = tree.xpath(LWMInterface.PLAYER_PAGE_CLANS_XPATH)
-        if len(name) >= 1:
-            name = repr(name[0]).split("\\")[0].strip("'")
-        else:
-            return None
-        clan_ids = []
-        for text in clans:
-            match = LWMInterface.CLAN_HASH_ID_PATTERN.match(text)
-            if match:
-                clan_ids.append(match.group(1))
-        player_id = LWMInterface.PLAYER_URL_ID_PATTERN.match(url).group(1)
-        print(player_id)
-        print(name)
-        print(clan_ids)
-        return {'id': player_id, 'name': name, 'clan_ids': clan_ids}
-
-    def get_clan(self, clan):
-        if LWMInterface.NUMBER_PATTERN.match(clan):
-            url = self.add_query(
-                    f"{LWMInterface.COM_DOMAIN}/{LWMInterface.CLAN_PAGE}",
-                    'id',
-                    clan)
-        else:
-            url = clan
-        if not url.startswith("http"):
-            url = "https://" + url
-        page = requests.get(url)
-        if page.status_code != 200:
-            return None
-
-        tree = html.fromstring(page.content)
-        title = tree.xpath(LWMInterface.CLAN_PAGE_TITLE_XPATH)
-        if len(title) == 1:
-            title = title[0]
-        else:
-            return None
-        match = LWMInterface.CLAN_TITLE_PATTERN.match(title)
-        clan_id = match.group(1)
-        clan_name = match.group(2)
-        return {
-                'id': clan_id,
-                'name': clan_name,
-                'qualified_name': f"#{clan_id} {clan_name}",
-                'url': {
-                        'com': self.add_query(
-                                f"{LWMInterface.COM_DOMAIN}/{LWMInterface.CLAN_PAGE}",
-                                'id',
-                                clan_id),
-                        'ru': self.add_query(
-                                f"{LWMInterface.RU_DOMAIN}/{LWMInterface.CLAN_PAGE}",
-                                'id',
-                                clan_id)}}
-
-    def get_clan_url(self, clan_id):
-        return {
-                'ru': "",
-                'com': ""}
-
-    def add_query(self, base:str, key:str, value):
-        connector = "&"
-        if base[-3:] == "php":
-            connector = "?"
-        return f"{base}{connector}{key}={str(value)}"
 
 if __name__ == '__main__':
     li = LWMInterface()
-    # li.get_player_new(4874384)
-    # li.get_player_new(8464564564848454646)
-    # li.get_player_new(545081)
-    # li.get_player_new(4366341)
-    # li.get_player_new(45644)
-    li.get_clan_new(7440)
-    li.get_clan_new(1271)
+    print(li.get_player(4874384))
+    print(li.get_clan(7440))
