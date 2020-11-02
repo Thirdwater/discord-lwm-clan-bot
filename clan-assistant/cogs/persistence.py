@@ -3,7 +3,7 @@ import json
 from discord.ext import commands
 
 
-class PersistenceCog(commands.Cog, name="Persistence"):
+class Persistence(commands.Cog):
     
     def __init__(self, bot):
         self.bot = bot
@@ -11,6 +11,9 @@ class PersistenceCog(commands.Cog, name="Persistence"):
         # print(self.bot.guilds)
         print(self.discord_config)
         print(self.members_record)
+
+    async def get_clan_id(self):
+        return self.discord_config['clan']['id']
 
     async def get_verification_channel(self):
         return self.discord_config['verification_channel']

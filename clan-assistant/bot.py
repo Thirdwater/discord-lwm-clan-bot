@@ -4,10 +4,10 @@ import os
 from dotenv import load_dotenv
 from discord.ext import commands
 
-from persistence import PersistenceCog
-from clan import ClanCog
-from verification import VerificationCog
-from log import LogCOg
+from cogs import Persistence
+from cogs import Clan
+from cogs import Verification
+from cogs import Log
 
 
 def main():
@@ -16,10 +16,10 @@ def main():
     
     bot = commands.Bot(command_prefix='!')
 
-    bot.add_cog(PersistenceCog(bot))
-    bot.add_cog(ClanCog(bot))
-    bot.add_cog(VerificationCog(bot))
-    bot.add_cog(LogCog(bot))
+    bot.add_cog(Persistence(bot))
+    bot.add_cog(Clan(bot))
+    bot.add_cog(Verification(bot))
+    bot.add_cog(Log(bot))
 
     bot.run(token)
 

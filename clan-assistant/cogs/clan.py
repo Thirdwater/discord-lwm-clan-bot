@@ -1,11 +1,15 @@
 import os
 from discord.ext import commands
 
+from lordswm import LWMInterface
 
-class ClanCog(commands.Cog, name="Clan"):
+
+class Clan(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.persistence = self.bot.get_cog("Persistence")
+        self.lwm = LWMInterface()
 
     @commands.group(name='query', aliases=['check'], invoke_without_command=True)
     @commands.has_permissions(manage_channels=True)

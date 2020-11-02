@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 
-class VerificationCog(commands.Cog, name="Verification"):
+class Verification(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
