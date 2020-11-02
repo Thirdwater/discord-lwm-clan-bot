@@ -131,7 +131,7 @@ class LWMInterface:
 
     def get_player_clans(self, tree):
         clan_links = tree.xpath(self.PLAYER_PAGE_CLANS_XPATH)
-        clans = []
+        clans = {}
         for link in clan_links:
             clan_name = link.findtext('b')
             clan_page = link.get('href')
@@ -143,7 +143,7 @@ class LWMInterface:
                     'id': clan_id,
                     'name': clan_name,
                     'url': url}
-            clans.append(clan)
+            clans[str(clan_id)] = clan
         return clans
 
     def get_clan_name(self, tree):
@@ -167,7 +167,7 @@ class LWMInterface:
 
     def get_clan_members(self, tree):
         member_rows = tree.xpath(self.CLAN_PAGE_MEMBERS_XPATH)
-        members = []
+        members = {}
         for row in member_rows:
             row_items = row.getchildren()
             order = row_items[0].text.split('.')[0]
@@ -201,7 +201,7 @@ class LWMInterface:
                     'event_points': event_points,
                     'event_status': event_status,
                     'url': url}
-            members.append(member)
+            members[str(member_id)] = member
         return members
 
 
