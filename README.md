@@ -25,3 +25,9 @@ $ python3 clan-assistant/bot.py
 ## Discord Commands
 
 * TO-DO
+
+## Resources and Links
+
+* [`discord.py` API](https://discordpy.readthedocs.io/en/latest/api.html)
+* [`discord.py` Extension API](https://discordpy.readthedocs.io/en/latest/ext/commands/api.html) (bot, cogs, etc.)
+* [XPath Cheatsheet](https://devhints.io/xpath)
