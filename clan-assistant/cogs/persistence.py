@@ -12,8 +12,11 @@ class Persistence(commands.Cog):
         print(self.discord_config)
         print(self.members_record)
 
-    async def get_clan_id(self):
-        return self.discord_config['clan']['id']
+    async def get_main_clan_id(self):
+        return self.discord_config['main_clan']['id']
+
+    async def get_family_clan_ids(self):
+        return self.discord_config['family_clans'].keys()
 
     async def get_verification_channel(self):
         return self.discord_config['verification_channel']
@@ -25,9 +28,11 @@ class Persistence(commands.Cog):
         self.discord_config_filename = os.getenv('DISCORD_CONFIG')
         self.members_record_filename = os.getenv('MEMBERS_RECORD')
         self.new_discord_config = {
-                'clan': {
+                'main_clan': {
                         'id': None,
                         'name': None},
+                'family_clans': {},
+                'use_verification_code': False,
                 'verification_channel': {
                         'id': None,
                         'name': None,
