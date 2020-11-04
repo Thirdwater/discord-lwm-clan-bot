@@ -1,0 +1,63 @@
+@startuml
+
+title Verification Channel
+
+participant "Discord" as discord
+participant "Message View" as view
+participant "Channel Controller" as controller
+participant "Persistence Model" as persistence
+participant "Storage" as storage
+
+activate controller
+activate discord
+
+group Initialisation
+
+persistence -> storage: read_discord_config()
+    activate storage
+    return config
+
+end
+
+group Mutator
+
+discord --> controller: !channel set-verification
+    controller -> persistence: set_verification_channel(channel)
+        activate persistence
+        persistence -> persistence: config.verification_channel = channel
+        persistence -> storage: save_discord_config()
+            activate storage
+            return success
+        return success
+    controller -> view: format_message(success)
+        activate view
+        return message
+    controller --> discord: display(message)
+
+end
+
+group Accessor
+
+discord --> controller: !channel get-verification
+    controller -> persistence: get_verification_channel()
+        activate persistence
+        return config.verification_channel
+        
+        alt channel is not none
+            controller -> view: format_message(channel)
+                activate view
+                return message
+        else channel is none
+            controller -> view: get_mutator_help()
+                activate view
+                return message
+        end
+        
+    controller --> discord: display(message)
+
+end
+
+deactivate controller
+deactivate discord
+
+@enduml
