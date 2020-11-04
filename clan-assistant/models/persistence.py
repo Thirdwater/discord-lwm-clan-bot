@@ -1,15 +1,14 @@
 import os
 import json
-from discord.ext import commands
 
 
-class Persistence(commands.Cog):
+class Persistence:
     
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self):
         self.load_config()
-        # print(self.bot.guilds)
+        print("  Discord config:")
         print(self.discord_config)
+        print("  Members record:")
         print(self.members_record)
 
     async def get_main_clan_id(self):

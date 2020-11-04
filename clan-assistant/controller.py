@@ -2,7 +2,7 @@ import os
 from discord.ext import commands
 
 
-class BotController(commands.Cog):
+class Controller(commands.Cog):
 
     def __init__(self, model, view):
         self.model = model

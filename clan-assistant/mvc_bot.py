@@ -2,12 +2,16 @@
 
 
 from dotenv import load_dotenv
-from controller import BotController
+from model import Model
+from view import View
+from controller import Controller
 
 
 def main():
     load_dotenv()
-    bot_controller = BotController(None, None)
+    model = Model()
+    view = View()
+    controller = Controller(model, view)
 
 
 if __name__ == '__main__':
