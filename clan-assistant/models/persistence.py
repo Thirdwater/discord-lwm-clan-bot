@@ -6,9 +6,9 @@ class Persistence:
     
     def __init__(self):
         self.load_config()
-        print("  Discord config:")
+        print("    Discord config:")
         print(self.discord_config)
-        print("  Members record:")
+        print("    Members record:")
         print(self.members_record)
 
     async def get_main_clan_id(self):
