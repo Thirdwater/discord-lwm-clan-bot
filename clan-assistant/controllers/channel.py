@@ -24,11 +24,12 @@ class ChannelController(commands.Cog):
     async def get_verification_channel(self, context):
         "Displays the channel assigned for member verification"
         channel = await self.model.persistence.get_verification_channel()
-        if channel is None:
+        if channel['id'] is None:
             await context.send("Verification channel has not been set.")
             await context.send_help(self.bot.get_command('channel set-verification'))
             return
-        
+        channel_string = self.view.channel.to_string(channel)
+        await context.send("Verification channel is {channel_string}.")
 
     @channel.command(name='set-output')
     @commands.has_permissions(manage_channels=True)
@@ -41,10 +42,12 @@ class ChannelController(commands.Cog):
     async def get_output_channel(self, context):
         "Displays the channel assigned to log bot outputs"
         channel = await self.model.persistence.get_output_channel()
-        if channel is None:
+        if channel['id'] is None:
             await context.send("Output channel has not been set.")
             await context.send_help(self.bot.get_command('channel set-output'))
             return
+        channel_string = self.view.channel.to_string(channel)
+        await context.send("Output channel is {channel_string}.")
 
     @channel.error
     @set_verification_channel.error

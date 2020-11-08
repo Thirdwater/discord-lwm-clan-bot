@@ -6,10 +6,6 @@ class Persistence:
     
     def __init__(self):
         self.load_config()
-        print("    Discord config:")
-        print(self.discord_config)
-        print("    Members record:")
-        print(self.members_record)
 
     async def get_main_clan_id(self):
         return self.discord_config['main_clan']['id']
@@ -49,6 +45,10 @@ class Persistence:
         self.new_members_record = []
         self.members_record = self.load_json(
                 self.members_record_filename, default=self.new_members_record)
+        print("    Discord config:")
+        print(self.discord_config)
+        print("    Members record:")
+        print(self.members_record)
         
     async def save_json(self, filename, content):
         with open(filename, 'w', encoding='utf8') as json_file:

@@ -1,4 +1,7 @@
+from views import ChannelView
+
+
 class View:
 
     def __init__(self):
-        pass
+        self.channel = ChannelView()
