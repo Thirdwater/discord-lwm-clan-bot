@@ -1,0 +1,35 @@
+@startuml
+
+title Clan Assistant DM - Commands
+
+participant "Clan Assistant DM (Bot)" as dm
+participant "Message View" as view
+participant "DM Controller" as controller
+participant "Persistence Model" as persistence
+
+dm --> controller: command, discord_user
+    activate dm
+    activate controller
+    controller -> persistence: is_verified(discord_user)
+        activate persistence
+        return status
+    alt not verified
+        controller -> view: get_decline_message()
+            activate view
+            return message
+        controller -> view: get_verification_instruction()
+            activate view
+            return instruction
+        controller --> dm: send(message)
+        controller --> dm: send(instruction)
+    else verified
+        controller -> controller: result = process(command)
+        controller -> view: format(result)
+            activate view
+            return result
+        controller --> dm: send(result)
+        deactivate dm
+        deactivate controller
+    end
+    
+@enduml
