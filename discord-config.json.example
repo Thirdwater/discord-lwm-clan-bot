@@ -1,0 +1,24 @@
+{
+    "family_clans": {},
+    "main_clan": {
+        "id": null,
+        "name": null
+    },
+    "output_channel": {
+        "category": {
+            "id": null,
+            "name": null
+        },
+        "id": null,
+        "name": null
+    },
+    "use_verification_code": false,
+    "verification_channel": {
+        "category": {
+            "id": null,
+            "name": null
+        },
+        "id": null,
+        "name": null
+    }
+}
