@@ -1,0 +1,63 @@
+@startuml
+
+title Clan Assistant DM - Verification
+
+participant "Clan Assistant DM (Bot)" as dm
+participant "Message View" as view
+participant "DM Controller" as dm_controller
+participant "Verification Controller" as verification_controller
+participant "LWM Interface" as lwm
+participant "Persistence" as persistence
+
+group Request Verification Code
+
+    dm --> dm_controller: player_reference, discord_user
+        activate dm
+        activate dm_controller
+        dm_controller -> verification_controller: verify(player_reference, discord_user)
+            activate verification_controller
+            note right: Verification Process Sequence
+            return message
+        dm_controller -> dm: send(message)
+        deactivate dm
+        deactivate dm_controller
+
+end
+
+group Check Verification Code
+
+    dm --> dm_controller: trigger_message, discord_user
+        activate dm
+        activate dm_controller
+        dm_controller -> verification_controller: check_verification_code(discord_user)
+            activate verification_controller
+            verification_controller ->persistence: get_player_code(discord_user)
+                activate persistence
+                return player, generated_code
+            verification_controller -> lwm: get_player_description(player)
+                activate lwm
+                return description
+            verification_controller -> verification_controller: check_code(generated_code, description)
+            alt code mismatch
+                verification_controller -> dm_controller: code_mismatch
+                dm_controller -> view: get_code_mismatch_message()
+                    activate view
+                    return message
+                dm_controller --> dm: send(message)
+            else code match
+                verification_controller -> persistence: add_member(player, discord_user)
+                    activate persistence
+                    return success
+                verification_controller -> dm_controller: code_match
+                deactivate verification_controller
+                dm_controller -> view: get_verification_success_message()
+                    activate view
+                    return message
+                dm_controller --> dm: send(message)
+                deactivate dm
+                deactivate dm_controller
+            end
+
+end
+
+@enduml

@@ -1,0 +1,110 @@
+@startuml
+
+title Verification Process
+
+participant "Discord" as discord
+participant "Bot DM" as dm
+participant "Message View" as view
+participant "Verification Controller" as controller
+participant "LWM Interface" as lwm
+participant "Persistence Model" as persistence
+participant "Storage" as storage
+
+activate discord
+
+group Initialisation
+persistence -> storage: read_discord_config()
+    activate persistence
+        activate storage
+        return registered_clans, use_verification_code
+persistence -> storage: read_members_record()
+        activate storage
+        return record
+deactivate persistence
+end
+
+discord --> controller: player_reference
+    activate controller
+    controller -> lwm: get_player(player_reference)
+        activate lwm
+        return player
+        
+    controller -> persistence: get_registered_clans()
+        activate persistence
+        return registered_clans
+        
+    controller -> controller: is_player_in_clans(player, registered_clans)
+        activate controller
+    alt Non-member
+        return false
+        controller -> view: get_not_a_member_message(player)
+            activate view
+            return message
+        controller --> discord: display(message)
+    end
+    
+    controller -> lwm: get_clan_members(registered_clans)
+        activate lwm
+        return members
+        
+    controller -> persistence: update_members_record(members)
+        activate persistence
+        persistence -> persistence: ex_members = remove_ex_members()
+        persistence -> storage: save_members_record()
+            activate storage
+            return success
+        return verified_members, ex_members
+        
+    alt Schedule
+        controller -> controller: remove_ex_members(ex_members)
+    end
+        
+    controller -> controller: is_player_verified(player, verified_members)
+        activate controller
+    alt Verified member
+        return true
+        controller -> view: get_already_verified_message(player)
+            activate view
+            return message
+        controller --> discord: display(message)
+    end
+    
+    controller -> persistence: get_verification_mode()
+        activate persistence
+        return use_verification_code
+    
+    alt No verification code
+        controller -> persistence: add_verified_member(player)
+            activate persistence
+            persistence -> storage: save_members_record()
+                activate storage
+                return success
+            return success
+        controller -> view: get_verification_success_message(player)
+            activate view
+            return message
+        controller --> discord: display(message)
+    end
+    
+    controller -> controller: generate_verification_code(player)
+    controller -> persistence: add_verification_code(player, code)
+        activate persistence
+        persistence -> storage: save_verification_code(player, code)
+            activate storage
+            return success
+        return success
+    controller -> view: get_verification_process_message(player)
+        activate view
+        return message
+    controller -> view: get_verification_code_instruction(player, code)
+        activate view
+        return instruction
+    controller --> discord: display(message)
+    controller --> dm: send(instruction)
+        activate dm
+        deactivate dm
+    
+deactivate controller
+deactivate discord
+
+@enduml
