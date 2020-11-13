@@ -9,6 +9,7 @@ class ChannelController(commands.Cog):
         self.view = view
 
     async def log_to_output(self, message):
+        print("    Logging..")
         channel_model = await self.model.persistence.get_output_channel()
         print(channel_model)
         if channel_model['id'] is None:
@@ -39,7 +40,9 @@ class ChannelController(commands.Cog):
         await self.model.persistence.set_verification_channel(channel)
         await self.model.persistence.save_config()
         await context.send(f"Verification channel has been set to {channel_string}{previous_string}.")
+        print("a")
         await self.log_to_output(f"{self.bot.name} set the verification channel to {channel_string}{previous_string}.")
+        print("b")
 
     @channel.command(name='get-verification')
     @commands.has_permissions(manage_channels=True)
