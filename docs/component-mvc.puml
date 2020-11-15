@@ -1,0 +1,78 @@
+@startuml
+
+
+skinparam componentStyle uml2
+
+title MVC Architecture
+
+cloud "Discord" as discord {
+
+}
+
+cloud "Internet" as internet {
+
+}
+
+database "Storage" as storage {
+    component "Discord Config" as storage_discord_config
+    component "Members" as storage_members
+}
+note bottom of storage_members
+    Tracks verified users
+    Tracks matching lwm profile
+    Tracks verification code
+end note
+note bottom of storage_discord_config
+    Tracks clan(s)
+    Tracks channel setups
+end note
+
+
+package "View" as view {
+    component "Discord API" as api_discord
+    component "Message" as view_message
+}
+note bottom of view_message
+    Formats messages
+end note
+
+
+package "Model" as model {
+    component "LWM Interface" as interface_lwm
+    component "Persistence" as model_persistence
+}
+note bottom of interface_lwm
+    Extracts profile page
+    Extracts clan page
+end note
+
+
+package "Controller" as controller {
+    component "DM" as controller_dm
+    component "Verification" as controller_verification
+    component "Channel" as controller_channel
+}
+note bottom of controller_verification
+    Checks clan membership
+    Verifies discord users
+end note
+note bottom of controller_dm
+    Assigns verification code
+    Checks verification code
+    Processes commands
+end note
+note bottom of controller_channel
+    Manages logging channel
+    Manages verification channel
+end note
+
+
+api_discord -left-> discord
+interface_lwm -right-> internet
+model_persistence .right. storage
+
+controller .up.> view: use
+controller .up.> model: use
+
+
+@enduml
